@@ -1,0 +1,16 @@
+version: '3'
+
+services:
+  postgres:
+    image: postgres
+    container_name: product-service-db
+    restart: always
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_SSLMODE: disable
+    ports:
+      - 5432:5432
+    volumes:
+      - ./db.sql:/docker-entrypoint-initdb.d/db.sql
