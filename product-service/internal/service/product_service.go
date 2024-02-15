@@ -17,3 +17,27 @@ func (productService *ProductService) CreateProduct(name, description, imageUrl 
 	}
 	return product, nil
 }
+
+func (productService *ProductService) FindProducts(page int8, pageSize int) ([]*domain.Product, error) {
+	products, err := productService.ProductRepo.FindProducts(page, pageSize)
+	if err != nil {
+		return nil, err
+	}
+	return products, nil
+}
+
+func (productService *ProductService) FindProductByID(id string) (*domain.Product, error) {
+	product, err := productService.ProductRepo.FindProductById(id)
+	if err != nil {
+		return nil, err
+	}
+	return product, nil
+}
+
+func (productService *ProductService) FindProductByDepartmentId(departmentId string) ([]*domain.Product, error) {
+	products, err := productService.ProductRepo.FindProductByDepartmentId(departmentId)
+	if err != nil {
+		return nil, err
+	}
+	return products, nil
+}
