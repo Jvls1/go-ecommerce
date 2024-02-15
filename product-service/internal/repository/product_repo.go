@@ -23,7 +23,7 @@ func (productRepo *ProductRepo) CreateProduct(product *domain.Product) (*domain.
 	return product, nil
 }
 
-func (productRepo *ProductRepo) FindProducts(page int8, pageSize int) ([]*domain.Product, error) {
+func (productRepo *ProductRepo) FindProducts(page int, pageSize int) ([]*domain.Product, error) {
 	offset := int(page-1) * pageSize
 	limit := pageSize
 
