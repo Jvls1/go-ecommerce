@@ -1,8 +1,10 @@
 ###
-GET http://localhost:8080/products
+GET http://localhost:8080/api/v1/products
+    ?page=0
+    &pageSize=10
 
 ###
-POST http://localhost:8080/products
+POST http://localhost:8080/api/v1/products
 Content-Type: application/json
 
 {
@@ -11,5 +13,7 @@ Content-Type: application/json
   "image_url": "https://example.com/image.jpg",
   "price": 19.99,
   "quantity": 10,
-  "department_id": 1
+  "department_id": "880da008-32e4-4083-8b8a-43f9f3c9bbf2"
 }
+
+###

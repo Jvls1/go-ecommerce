@@ -9,6 +9,10 @@ type ProductService struct {
 	ProductRepo repository.ProductRepo
 }
 
+func NewProductService(productRepository *repository.ProductRepo) *ProductService {
+	return &ProductService{ProductRepo: *productRepository}
+}
+
 func (productService *ProductService) CreateProduct(name, description, imageUrl string, price float64, quantity int32, departmentId string) (*domain.Product, error) {
 	product := domain.NewProduct(name, description, imageUrl, price, quantity, departmentId)
 	_, err := productService.ProductRepo.CreateProduct(product)
