@@ -15,7 +15,7 @@ func NewProductRepo(db *sql.DB) *ProductRepo {
 }
 
 func (productRepo *ProductRepo) CreateProduct(product *domain.Product) (*domain.Product, error) {
-	sql := "INSERT INTO products (id, name, description, image_url, price, quantity, department_id) VALUES (?, ?, ?, ?, ?, ?, ?)"
+	sql := "INSERT INTO products (id, name, description, image_url, price, quantity, department_id) VALUES ($1, $2, $3, $4, $5, $6, $7)"
 	_, err := productRepo.db.Exec(sql, product.ID, product.Name, product.Description, product.ImageURL, product.Price, product.Quantity, product.DepartmentID)
 	if err != nil {
 		return nil, err

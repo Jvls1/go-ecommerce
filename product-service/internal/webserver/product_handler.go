@@ -26,13 +26,13 @@ func (productHandler *ProductHandler) CreateProduct(c *gin.Context) {
 		return
 	}
 
-	result, err := productHandler.ProductService.CreateProduct(product.Name, product.Description, product.ImageURL, product.Price, product.Quantity, product.DepartmentID)
+	createdProduct, err := productHandler.ProductService.CreateProduct(product.Name, product.Description, product.ImageURL, product.Price, product.Quantity, product.DepartmentID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusCreated, result.ID)
+	c.JSON(http.StatusCreated, createdProduct.ID)
 }
 
 func (productHandler *ProductHandler) GetProducts(c *gin.Context) {
@@ -49,10 +49,8 @@ func (productHandler *ProductHandler) GetProducts(c *gin.Context) {
 		pageSize = 10
 	}
 
-	// Agora você tem os valores de page e pageSize como inteiros
-	// Faça o que for necessário com esses valores, por exemplo, passá-los para o repository
+	productHandler.ProductService.FindProducts(page, pageSize)
 
-	// Exemplo de resposta simples (substitua isso pelo seu código real)
 	c.JSON(http.StatusOK, gin.H{"page": page, "pageSize": pageSize})
 }
 
@@ -83,7 +81,7 @@ func (productHandler *ProductHandler) GetProductByDepartmentID(c *gin.Context) {
 
 	products, err := productHandler.ProductService.FindProductsByDepartmentId(departmentID)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Product not found for this "})
+		c.JSON(http.StatusNotFound, gin.H{"error": "Product not found for this department"})
 		return
 	}
 
