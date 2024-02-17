@@ -1,4 +1,3 @@
-CREATE DATABASE product_service;
 \c product_service;
 
 CREATE TABLE products (
