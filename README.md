@@ -1,15 +1,15 @@
 
-# Product Service
+# Go E-commerce
 
-Service to create and list products.
+E-commerce project with microservice architecture using Go, Gin-Gonic, Postgres, Mongo and Docker.
 
 
-## Endpoints
+## Product Service
 
 #### Create product
 
 ```http
-POST /api/products/
+POST /api/v1/products/
 ```
 
 ```json
@@ -27,17 +27,30 @@ POST /api/products/
 #### Find all products (with pagination)
 
 ```http
-GET /api/products
+GET /api/v1/products?page=0&pageSize=10
 ```
+| Param       | Type       |
+| :---------- | :--------- |
+| `page`      | `number`   |
+| `pageSize`  | `number`   |
 
-
-#### Find product by UUID
+#### Find product by id
 
 ```http
-GET /api/products/${uuid}
+GET /api/v1/products/${id}
 ```
 
-| Param       | Type       | Description                         |
-| :---------- | :--------- | :---------------------------------- |
-| `id`        | `string`   | Product UUID                        |
+| Param       | Type       | 
+| :---------- | :--------- | 
+| `id`        | `uuid`     |
+
+#### Find product by department id
+
+```http
+GET /api/v1/products/department/${departmentId}
+```
+
+| Param           | Type       | 
+| :-------------- | :--------- | 
+| `departmentId`  | `uuid`     |
 
