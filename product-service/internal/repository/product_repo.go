@@ -2,6 +2,7 @@ package repository
 
 import (
 	"database/sql"
+	"errors"
 
 	"github.com/Jvls1/go-ecommerce/product-service/domain"
 )
@@ -24,10 +25,14 @@ func (productRepo *ProductRepo) CreateProduct(product *domain.Product) (*domain.
 }
 
 func (productRepo *ProductRepo) FindProducts(page int, pageSize int) ([]*domain.Product, error) {
-	offset := int(page-1) * pageSize
+	if page < 0 || pageSize <= 0 {
+		return nil, errors.New("page and pageSize must be positive integers")
+	}
+
+	offset := page * pageSize
 	limit := pageSize
 
-	sql := "SELECT * FROM products LIMIT ? OFFSET ?"
+	sql := "SELECT * FROM products WHERE deleted_at is null LIMIT $1 OFFSET $2"
 
 	rows, err := productRepo.db.Query(sql, limit, offset)
 	if err != nil {
@@ -39,7 +44,8 @@ func (productRepo *ProductRepo) FindProducts(page int, pageSize int) ([]*domain.
 
 	for rows.Next() {
 		var product domain.Product
-		err := rows.Scan(&product.ID, &product.Name, &product.Price, &product.Description)
+		err := rows.Scan(&product.ID, &product.Name, &product.Description, &product.ImageURL, &product.Price, &product.Quantity, &product.DepartmentID, &product.CreatedAt, &product.UpdatedAt, &product.DeletedAt)
+
 		if err != nil {
 			return nil, err
 		}
@@ -57,7 +63,7 @@ func (productRepo *ProductRepo) FindProductById(id string) (*domain.Product, err
 	var product domain.Product
 	sql := "SELECT id, name, description, image_url, price, quantity, department_id FROM products WHERE id = ?"
 	err := productRepo.db.QueryRow(sql, id).
-		Scan(&product.ID, &product.Name, &product.Description, &product.ImageURL, &product.Price, &product.Quantity, &product.DepartmentID)
+		Scan(&product.ID, &product.Name, &product.Description, &product.ImageURL, &product.Price, &product.Quantity, &product.DepartmentID, &product.CreatedAt, &product.UpdatedAt, &product.DeletedAt)
 	if err != nil {
 		return nil, err
 	}
@@ -75,7 +81,7 @@ func (productRepo *ProductRepo) FindProductByDepartmentId(departmentId string) (
 	var products []*domain.Product
 	for rows.Next() {
 		var product domain.Product
-		err := rows.Scan(&product.ID, &product.Name, &product.Description, &product.ImageURL, &product.Price, &product.Quantity, &product.DepartmentID)
+		err := rows.Scan(&product.ID, &product.Name, &product.Description, &product.ImageURL, &product.Price, &product.Quantity, &product.DepartmentID, &product.CreatedAt, &product.UpdatedAt, &product.DeletedAt)
 		if err != nil {
 			return nil, err
 		}

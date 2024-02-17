@@ -1,22 +1,23 @@
 package domain
 
 import (
+	"database/sql"
 	"time"
 
 	"github.com/google/uuid"
 )
 
 type Product struct {
-	ID           string  `json:"id"`
-	Name         string  `json:"name"`
-	Description  string  `json:"description"`
-	ImageURL     string  `json:"image_url"`
-	Price        float64 `json:"price"`
-	Quantity     int32   `json:"quantity"`
-	DepartmentID string  `json:"department_id"`
-	CreatedAt    time.Time
-	UpdatedAt    time.Time
-	DeletedAt    time.Time
+	ID           string       `json:"id"`
+	Name         string       `json:"name"`
+	Description  string       `json:"description"`
+	ImageURL     string       `json:"image_url"`
+	Price        float64      `json:"price"`
+	Quantity     int32        `json:"quantity"`
+	DepartmentID string       `json:"department_id"`
+	CreatedAt    time.Time    `json:"created_at"`
+	UpdatedAt    time.Time    `json:"updated_at"`
+	DeletedAt    sql.NullTime `json:"-"`
 }
 
 func NewProduct(name, description, imageUrl string, price float64, quantity int32, departmentID string) *Product {

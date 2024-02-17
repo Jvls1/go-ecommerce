@@ -49,9 +49,14 @@ func (productHandler *ProductHandler) GetProducts(c *gin.Context) {
 		pageSize = 10
 	}
 
-	productHandler.ProductService.FindProducts(page, pageSize)
+	products, err := productHandler.ProductService.FindProducts(page, pageSize)
 
-	c.JSON(http.StatusOK, gin.H{"page": page, "pageSize": pageSize})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"items": products, "page": page, "pageSize": pageSize})
 }
 
 func (productHandler *ProductHandler) GetProductById(c *gin.Context) {
