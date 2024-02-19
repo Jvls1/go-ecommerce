@@ -23,3 +23,5 @@ go.work
 # Env Files
 .env
 /.env
+
+.idea/
