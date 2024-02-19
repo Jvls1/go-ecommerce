@@ -33,3 +33,11 @@ func NewProduct(name, description, imageUrl string, price float64, quantity int3
 		UpdatedAt:    time.Now(),
 	}
 }
+
+func (p *Product) IsValid() bool {
+	if p.ID == "" || p.Name == "" || p.Price < 0 || p.Quantity < 0 || p.DepartmentID == "" {
+		return false
+	}
+
+	return true
+}
