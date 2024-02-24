@@ -10,15 +10,22 @@ import (
 	"github.com/google/uuid"
 )
 
-type ProductHandler struct {
-	ProductService *service.ProductService
+func NewProductHandler(productService service.ProductService) ProductHandler {
+	return &productHandler{productService}
 }
 
-func NewProductHandler(productService *service.ProductService) *ProductHandler {
-	return &ProductHandler{ProductService: productService}
+type productHandler struct {
+	ProductService service.ProductService
 }
 
-func (productHandler *ProductHandler) CreateProduct(c *gin.Context) {
+type ProductHandler interface {
+	CreateProduct(c *gin.Context)
+	GetProducts(c *gin.Context)
+	GetProductById(c *gin.Context)
+	GetProductByDepartmentID(c *gin.Context)
+}
+
+func (productHandler *productHandler) CreateProduct(c *gin.Context) {
 	var product domain.Product
 
 	if err := c.BindJSON(&product); err != nil {
@@ -35,7 +42,7 @@ func (productHandler *ProductHandler) CreateProduct(c *gin.Context) {
 	c.JSON(http.StatusCreated, createdProduct.ID)
 }
 
-func (productHandler *ProductHandler) GetProducts(c *gin.Context) {
+func (productHandler *productHandler) GetProducts(c *gin.Context) {
 	pageStr := c.Query("page")
 	pageSizeStr := c.Query("pageSize")
 
@@ -59,7 +66,7 @@ func (productHandler *ProductHandler) GetProducts(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"items": products, "page": page, "pageSize": pageSize})
 }
 
-func (productHandler *ProductHandler) GetProductById(c *gin.Context) {
+func (productHandler *productHandler) GetProductById(c *gin.Context) {
 	productID := c.Param("id")
 	err := uuid.Validate(productID)
 	if err != nil {
@@ -76,7 +83,7 @@ func (productHandler *ProductHandler) GetProductById(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": product})
 }
 
-func (productHandler *ProductHandler) GetProductByDepartmentID(c *gin.Context) {
+func (productHandler *productHandler) GetProductByDepartmentID(c *gin.Context) {
 	departmentID := c.Param("departmentID")
 	err := uuid.Validate(departmentID)
 	if err != nil {
