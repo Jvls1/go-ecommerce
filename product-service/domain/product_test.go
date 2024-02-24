@@ -38,11 +38,39 @@ func TestProductNullFields(t *testing.T) {
 }
 
 func TestProductValidation(t *testing.T) {
-	// Valid product
-	validProduct := NewProduct("Test Product", "Test Description", "http://example.com/image.jpg", 19.99, 100, "123")
-	assert.True(t, validProduct.IsValid(), "Expected valid product but got invalid.")
+	t.Run("EmptyDescription", func(t *testing.T) {
+		product := NewProduct("123", "", "Description", 10.0, 5, "123")
+		if !product.IsValid() {
+			t.Error("Expected product with empty description to be valid")
+		}
+	})
 
-	// Invalid product (e.g., negative price)
-	invalidProduct := NewProduct("Invalid Product", "Invalid Description", "http://example.com/image.jpg", -5.0, 50, "456")
-	assert.False(t, invalidProduct.IsValid(), "Expected invalid product but got valid.")
+	t.Run("EmptyName", func(t *testing.T) {
+		product := NewProduct("", "Valid Name", "Description", 10.0, 5, "123")
+		if product.IsValid() {
+			t.Error("Expected product with empty name to be invalid")
+		}
+	})
+
+	t.Run("NegativePrice", func(t *testing.T) {
+		product := NewProduct("123", "Valid Name", "Description", -10.0, 5, "123")
+		if product.IsValid() {
+			t.Error("Expected product with negative price to be invalid")
+		}
+	})
+
+	t.Run("NegativeQuantity", func(t *testing.T) {
+		product := NewProduct("123", "Valid Name", "Description", 10.0, -5, "123")
+		if product.IsValid() {
+			t.Error("Expected product with negative quantity to be invalid")
+		}
+	})
+
+	t.Run("EmptyDepartmentID", func(t *testing.T) {
+		product := NewProduct("123", "Valid Name", "Description", 10.0, 5, "")
+		if product.IsValid() {
+			t.Error("Expected product with empty department ID to be invalid")
+		}
+	})
+
 }
