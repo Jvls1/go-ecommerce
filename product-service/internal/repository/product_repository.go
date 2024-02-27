@@ -75,9 +75,16 @@ func (productRepository *productRepository) FindProducts(page int, pageSize int)
 
 func (productRepository *productRepository) FindProductById(id string) (*domain.Product, error) {
 	var product domain.Product
-	sqlQuery := "SELECT id, name, description, image_url, price, quantity, department_id FROM products WHERE id = ?"
-	err := productRepository.db.QueryRow(sqlQuery, id).
-		Scan(&product.ID, &product.Name, &product.Description, &product.ImageURL, &product.Price, &product.Quantity, &product.DepartmentID, &product.CreatedAt, &product.UpdatedAt, &product.DeletedAt)
+
+	stmt, err := productRepository.db.Prepare("SELECT id, name, description, image_url, price, quantity, department_id, created_at, updated_at FROM products WHERE id = $1")
+	if err != nil {
+		return nil, err
+	}
+	defer stmt.Close()
+
+	err = stmt.QueryRow(id).
+		Scan(&product.ID, &product.Name, &product.Description, &product.ImageURL, &product.Price, &product.Quantity, &product.DepartmentID, &product.CreatedAt, &product.UpdatedAt)
+
 	if err != nil {
 		return nil, err
 	}

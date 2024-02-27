@@ -39,7 +39,7 @@ func (productHandler *productHandler) CreateProduct(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, createdProduct.ID)
+	c.JSON(http.StatusCreated, gin.H{"data": createdProduct})
 }
 
 func (productHandler *productHandler) GetProducts(c *gin.Context) {
@@ -48,12 +48,14 @@ func (productHandler *productHandler) GetProducts(c *gin.Context) {
 
 	page, err := strconv.Atoi(pageStr)
 	if err != nil {
-		page = 1
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Error trying to convert the page value, has to be a number"})
+		return
 	}
 
 	pageSize, err := strconv.Atoi(pageSizeStr)
 	if err != nil {
-		pageSize = 10
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Error trying to convert the pageSize value, has to be a number"})
+		return
 	}
 
 	products, err := productHandler.ProductService.FindProducts(page, pageSize)
@@ -76,7 +78,7 @@ func (productHandler *productHandler) GetProductById(c *gin.Context) {
 
 	product, err := productHandler.ProductService.FindProductByID(productID)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Product not found"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
