@@ -1,9 +1,4 @@
 ###
-GET http://localhost:8080/api/v1/products
-    ?page=0
-    &pageSize=10
-
-###
 POST http://localhost:8080/api/v1/products
 Content-Type: application/json
 
@@ -17,3 +12,9 @@ Content-Type: application/json
 }
 
 ###
+GET http://localhost:8080/api/v1/products
+    ?page=0
+    &pageSize=10
+
+###
+GET http://localhost:8080/api/v1/products/0ab7872d-e92f-4510-80e3-0d18e1bf6b18

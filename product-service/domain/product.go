@@ -9,12 +9,12 @@ import (
 
 type Product struct {
 	ID           string       `json:"id"`
-	Name         string       `json:"name"`
+	Name         string       `json:"name" binding:"required"`
 	Description  string       `json:"description"`
 	ImageURL     string       `json:"image_url"`
-	Price        float64      `json:"price"`
-	Quantity     int32        `json:"quantity"`
-	DepartmentID string       `json:"department_id"`
+	Price        float64      `json:"price" binding:"required"`
+	Quantity     int32        `json:"quantity" binding:"required"`
+	DepartmentID string       `json:"department_id" binding:"required"`
 	CreatedAt    time.Time    `json:"created_at"`
 	UpdatedAt    time.Time    `json:"updated_at"`
 	DeletedAt    sql.NullTime `json:"-"`
