@@ -3,7 +3,7 @@ version: '3'
 services:
   postgres:
     image: postgres
-    container_name: product-service-db
+    container_name: auth-service-db
     restart: always
     environment:
       POSTGRES_USER: ${DB_USER}
