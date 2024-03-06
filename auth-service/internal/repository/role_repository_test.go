@@ -10,17 +10,20 @@ import (
 func TestRoleRepositoryWithContainer(t *testing.T) {
 	roleRepo := NewRoleRepository(db)
 	t.Run("Test role creation", func(t *testing.T) {
-		roleCreated, err := roleRepo.CreateRole(domain.NewRole("Admin", "Admin role"))
+		role, _ := domain.NewRole("Admin", "Admin role")
+		roleCreated, err := roleRepo.CreateRole(role)
 		assert.NotNil(t, roleCreated)
 		assert.NoError(t, err)
 	})
 	t.Run("Test null fields", func(t *testing.T) {
-		roleCreated, err := roleRepo.CreateRole(domain.NewRole("TestTest", "test"))
+		role, _ := domain.NewRole("TestTest", "test")
+		roleCreated, err := roleRepo.CreateRole(role)
 		assert.NoError(t, err)
 		assert.Nil(t, roleCreated.DeletedAt)
 	})
 	t.Run("Test find role by valid ID", func(t *testing.T) {
-		roleCreated, _ := roleRepo.CreateRole(domain.NewRole("Test2", "Test valid id"))
+		role, _ := domain.NewRole("Test2", "Test valid id")
+		roleCreated, _ := roleRepo.CreateRole(role)
 		role, err := roleRepo.FindById(roleCreated.ID)
 		assert.NotNil(t, role)
 		assert.NoError(t, err, err)
@@ -31,7 +34,7 @@ func TestRoleRepositoryWithContainer(t *testing.T) {
 		assert.Error(t, err)
 	})
 	t.Run("Test unique name constraint", func(t *testing.T) {
-		role := domain.NewRole("Unique", "Testing unique constraint")
+		role, _ := domain.NewRole("Unique", "Testing unique constraint")
 		_, _ = roleRepo.CreateRole(role)
 		roleCreated, err := roleRepo.CreateRole(role)
 		assert.Error(t, err)
