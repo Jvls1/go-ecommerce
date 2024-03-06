@@ -1,5 +1,1 @@
 package webserver
-
-func main() {
-
-}
