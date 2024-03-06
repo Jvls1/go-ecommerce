@@ -26,17 +26,20 @@ func TestMain(m *testing.M) {
 func TestPermissionRepositoryWithContainer(t *testing.T) {
 	permissionRepo := NewPermissionRepository(db)
 	t.Run("Test permission creation", func(t *testing.T) {
-		roleCreated, err := permissionRepo.CreatePermission(domain.NewPermission("Admin", "Admin permission"))
+		permission, _ := domain.NewPermission("Admin", "Admin permission")
+		roleCreated, err := permissionRepo.CreatePermission(permission)
 		assert.NotNil(t, roleCreated)
 		assert.NoError(t, err)
 	})
 	t.Run("Test null fields", func(t *testing.T) {
-		roleCreated, err := permissionRepo.CreatePermission(domain.NewPermission("TestTest", "test"))
+		permission, _ := domain.NewPermission("TestTest", "test")
+		roleCreated, err := permissionRepo.CreatePermission(permission)
 		assert.NoError(t, err)
 		assert.Nil(t, roleCreated.DeletedAt)
 	})
 	t.Run("Test find permission by valid ID", func(t *testing.T) {
-		roleCreated, _ := permissionRepo.CreatePermission(domain.NewPermission("Test2", "Test valid id"))
+		permission, _ := domain.NewPermission("Test2", "Test valid id")
+		roleCreated, _ := permissionRepo.CreatePermission(permission)
 		role, err := permissionRepo.FindPermissionById(roleCreated.ID)
 		assert.NotNil(t, role)
 		assert.NoError(t, err, err)
@@ -47,7 +50,7 @@ func TestPermissionRepositoryWithContainer(t *testing.T) {
 		assert.Error(t, err)
 	})
 	t.Run("Test unique name constraint", func(t *testing.T) {
-		permission := domain.NewPermission("Unique", "Testing unique constraint")
+		permission, _ := domain.NewPermission("Unique", "Testing unique constraint")
 		_, _ = permissionRepo.CreatePermission(permission)
 		permissionCreated, err := permissionRepo.CreatePermission(permission)
 		assert.Error(t, err)

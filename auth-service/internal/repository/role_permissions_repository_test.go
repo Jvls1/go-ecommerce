@@ -29,12 +29,14 @@ func setupRolePermissionsValues(db *sql.DB) (*domain.Role, *domain.Permission) {
 
 func setupValidRoleToPermission() *domain.Role {
 	roleRepo := NewRoleRepository(db)
-	roleCreated, _ := roleRepo.CreateRole(domain.NewRole("Role for permission", "test"))
+	role, _ := domain.NewRole("Role for permission", "test")
+	roleCreated, _ := roleRepo.CreateRole(role)
 	return roleCreated
 }
 
 func setupValidPermission(db *sql.DB) *domain.Permission {
 	permissionRepo := NewPermissionRepository(db)
-	permission, _ := permissionRepo.CreatePermission(domain.NewPermission("Permission valid", "test"))
-	return permission
+	permission, _ := domain.NewPermission("Permission valid", "test")
+	permissionCreated, _ := permissionRepo.CreatePermission(permission)
+	return permissionCreated
 }

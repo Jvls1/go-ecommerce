@@ -35,6 +35,7 @@ func setupValidUser() *domain.User {
 
 func setupValidRoleToUser() *domain.Role {
 	roleRepo := NewRoleRepository(db)
-	roleCreated, _ := roleRepo.CreateRole(domain.NewRole("Role for user", "test"))
+	role, _ := domain.NewRole("Role for user", "test")
+	roleCreated, _ := roleRepo.CreateRole(role)
 	return roleCreated
 }
