@@ -8,6 +8,7 @@ require (
 	github.com/stretchr/testify v1.8.4
 	github.com/testcontainers/testcontainers-go v0.28.0
 	github.com/testcontainers/testcontainers-go/modules/postgres v0.28.0
+	go.uber.org/mock v0.4.0
 	golang.org/x/crypto v0.17.0
 )
 
