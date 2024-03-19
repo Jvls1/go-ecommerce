@@ -15,11 +15,11 @@ type permissionRepository struct {
 }
 
 type PermissionRepository interface {
-	CreatePermission(permission *domain.Permission) (*domain.Permission, error)
-	FindPermissionById(id uuid.UUID) (*domain.Permission, error)
+	StorePermission(permission *domain.Permission) (*domain.Permission, error)
+	GetPermissionById(id uuid.UUID) (*domain.Permission, error)
 }
 
-func (permissionRepository *permissionRepository) CreatePermission(permission *domain.Permission) (*domain.Permission, error) {
+func (permissionRepository *permissionRepository) StorePermission(permission *domain.Permission) (*domain.Permission, error) {
 	stmt, err := permissionRepository.db.Prepare(`
 		INSERT INTO permissions (id, name, description, created_at, updated_at, deleted_at)
 		VALUES ($1, $2, $3, $4, $5, $6)
@@ -36,7 +36,7 @@ func (permissionRepository *permissionRepository) CreatePermission(permission *d
 	return permission, nil
 }
 
-func (permissionRepository *permissionRepository) FindPermissionById(id uuid.UUID) (*domain.Permission, error) {
+func (permissionRepository *permissionRepository) GetPermissionById(id uuid.UUID) (*domain.Permission, error) {
 	stmt, err := permissionRepository.db.Prepare(`
 		SELECT id, name, description, created_at, updated_at
 		  FROM permissions r

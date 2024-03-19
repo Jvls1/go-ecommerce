@@ -1,7 +1,6 @@
 package domain
 
 import (
-	"database/sql"
 	"errors"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
@@ -10,14 +9,14 @@ import (
 )
 
 type User struct {
-	ID        uuid.UUID    `json:"id"`
-	Name      string       `json:"name"`
-	Password  string       `json:"password,omitempty"`
-	Email     string       `json:"email"`
-	Roles     []Role       `json:"roles"`
-	CreatedAt time.Time    `json:"created_at"`
-	UpdatedAt time.Time    `json:"updated_at"`
-	DeletedAt sql.NullTime `json:"-"`
+	ID        uuid.UUID  `json:"id"`
+	Name      string     `json:"name"`
+	Password  string     `json:"password,omitempty"`
+	Email     string     `json:"email"`
+	Roles     []Role     `json:"roles"`
+	CreatedAt time.Time  `json:"created_at"`
+	UpdatedAt time.Time  `json:"updated_at"`
+	DeletedAt *time.Time `json:"-"`
 }
 
 func NewUser(name, plainPassword, email string) (*User, error) {

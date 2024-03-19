@@ -15,11 +15,12 @@ type userRepository struct {
 }
 
 type UserRepository interface {
-	CreateUser(user *domain.User) (*domain.User, error)
-	FindUserById(id uuid.UUID) (*domain.User, error)
+	StoreUser(user *domain.User) (*domain.User, error)
+	GetUserById(id uuid.UUID) (*domain.User, error)
+	AddRoleToUser(userID, roleID uuid.UUID) error
 }
 
-func (userRepository *userRepository) CreateUser(user *domain.User) (*domain.User, error) {
+func (userRepository *userRepository) StoreUser(user *domain.User) (*domain.User, error) {
 	stmt, err := userRepository.db.Prepare(`
 		INSERT INTO users (id, name, password, email, created_at, updated_at, deleted_at)
 		VALUES ($1, $2, $3, $4, $5, $6, $7)
@@ -36,7 +37,7 @@ func (userRepository *userRepository) CreateUser(user *domain.User) (*domain.Use
 	return user, nil
 }
 
-func (userRepository *userRepository) FindUserById(id uuid.UUID) (*domain.User, error) {
+func (userRepository *userRepository) GetUserById(id uuid.UUID) (*domain.User, error) {
 	stmt, err := userRepository.db.Prepare(`
 		SELECT id, name, email, created_at, updated_at
 		FROM users u
@@ -82,4 +83,19 @@ func (userRepository *userRepository) getRolesByUserId(userId uuid.UUID) ([]doma
 		roles = append(roles, role)
 	}
 	return roles, nil
+}
+
+func (userRepository *userRepository) AddRoleToUser(userID, roleID uuid.UUID) error {
+	stmt, err := userRepository.db.Prepare(`
+		INSERT INTO user_roles (user_id, role_id) VALUES ($1, $2)
+	`)
+	defer stmt.Close()
+	if err != nil {
+		return err
+	}
+	_, err = stmt.Exec(userID, roleID)
+	if err != nil {
+		return err
+	}
+	return nil
 }

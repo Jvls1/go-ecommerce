@@ -15,11 +15,12 @@ type roleRepository struct {
 }
 
 type RoleRepository interface {
-	CreateRole(role *domain.Role) (*domain.Role, error)
-	FindById(id uuid.UUID) (*domain.Role, error)
+	StoreRole(role *domain.Role) (*domain.Role, error)
+	GetRoleById(id uuid.UUID) (*domain.Role, error)
+	AddPermissionToRole(roleID, permissionID uuid.UUID) error
 }
 
-func (roleRepository *roleRepository) CreateRole(role *domain.Role) (*domain.Role, error) {
+func (roleRepository *roleRepository) StoreRole(role *domain.Role) (*domain.Role, error) {
 	stmt, err := roleRepository.db.Prepare(`
 		INSERT INTO roles (id, name, description, created_at, updated_at, deleted_at)
 		VALUES ($1, $2, $3, $4, $5, $6) 
@@ -34,7 +35,7 @@ func (roleRepository *roleRepository) CreateRole(role *domain.Role) (*domain.Rol
 	return role, nil
 }
 
-func (roleRepository *roleRepository) FindById(id uuid.UUID) (*domain.Role, error) {
+func (roleRepository *roleRepository) GetRoleById(id uuid.UUID) (*domain.Role, error) {
 	stmt, err := roleRepository.db.Prepare(`
 		SELECT id, name, description, created_at, updated_at
 		  FROM roles r
@@ -50,4 +51,19 @@ func (roleRepository *roleRepository) FindById(id uuid.UUID) (*domain.Role, erro
 		return nil, err
 	}
 	return role, nil
+}
+
+func (roleRepository *roleRepository) AddPermissionToRole(roleID, permissionID uuid.UUID) error {
+	stmt, err := roleRepository.db.Prepare(`
+		INSERT INTO role_permissions (role_id, permission_id) VALUES ($1, $2)
+	`)
+	defer stmt.Close()
+	if err != nil {
+		return err
+	}
+	_, err = stmt.Exec(roleID, permissionID)
+	if err != nil {
+		return err
+	}
+	return nil
 }
