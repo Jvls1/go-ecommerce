@@ -1,0 +1,31 @@
+POST http://localhost:8081/permissions/
+Content-Type: application/json
+
+{
+  "name": "create-product-4",
+  "description": "Grant access to create a product"
+}
+
+###
+GET http://localhost:8081/permissions/85d3a1a3-4544-4397-b7a8-b9d419715380
+
+###
+POST http://localhost:8081/roles/
+Content-Type: application/json
+
+{
+  "name": "Admin1",
+  "description": "Admin role"
+}
+
+###
+GET http://localhost:8081/roles/5658b58d-b749-4a74-bb71-483324eb0705
+
+###
+POST http://localhost:8081/roles/permissions
+Content-Type: application/json
+
+{
+  "roleId": "5658b58d-b749-4a74-bb71-483324eb0705",
+  "permissionId": "6d6b8531-d5bc-4c7b-92ab-ac52837e0280"
+}
