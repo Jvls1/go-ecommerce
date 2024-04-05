@@ -24,13 +24,13 @@ type PermissionHandler interface {
 }
 
 func (ph *permissionHandler) CreatePermission(w http.ResponseWriter, r *http.Request) {
-	var permissionToSave *domain.Permission
+	var permissionToSave domain.Permission
 	err := json.NewDecoder(r.Body).Decode(&permissionToSave)
 	if err != nil {
 		helpers.HandlerError(w, err, "Can't convert JSON", http.StatusBadRequest)
 		return
 	}
-	permission, err := ph.permissionService.SavePermission(permissionToSave)
+	permission, err := ph.permissionService.SavePermission(permissionToSave.Name, permissionToSave.Description)
 	if err != nil {
 		helpers.HandlerError(w, err, "Can't save the permission", http.StatusInternalServerError)
 		return
@@ -58,6 +58,7 @@ func (ph *permissionHandler) GetPermissionById(w http.ResponseWriter, r *http.Re
 		helpers.HandlerError(w, err, "Can't save the permission", http.StatusInternalServerError)
 		return
 	}
+	w.WriteHeader(http.StatusOK)
 	err = json.NewEncoder(w).Encode(permission)
 	if err != nil {
 		helpers.HandlerError(w, err, "Error processing the request", http.StatusInternalServerError)

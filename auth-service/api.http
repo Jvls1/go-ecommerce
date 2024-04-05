@@ -29,3 +29,25 @@ Content-Type: application/json
   "roleId": "5658b58d-b749-4a74-bb71-483324eb0705",
   "permissionId": "6d6b8531-d5bc-4c7b-92ab-ac52837e0280"
 }
+
+###
+POST http://localhost:8081/users/
+Content-Type: application/json
+
+{
+  "name": "JoJow",
+  "password": "strongPassword123",
+  "email": "joaovlopes000@gmail.com"
+}
+
+###
+GET http://localhost:8081/users/bd42b8fd-5ba1-482b-8b3e-13b77095a7d7
+
+###
+POST http://localhost:8081/users/roles
+Content-Type: application/json
+
+{
+  "userId": "bd42b8fd-5ba1-482b-8b3e-13b77095a7d7",
+  "roleId": "5658b58d-b749-4a74-bb71-483324eb0705"
+}

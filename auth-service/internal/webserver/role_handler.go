@@ -32,7 +32,7 @@ func (rh *roleHandler) CreateRole(w http.ResponseWriter, r *http.Request) {
 		helpers.HandlerError(w, err, "Can't convert JSON", http.StatusBadRequest)
 		return
 	}
-	role, err := rh.roleService.SaveRole(roleToSave)
+	role, err := rh.roleService.SaveRole(roleToSave.Name, roleToSave.Description)
 	if err != nil {
 		helpers.HandlerError(w, err, "Can't save the role", http.StatusInternalServerError)
 		return

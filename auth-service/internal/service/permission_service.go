@@ -17,15 +17,20 @@ type permissionService struct {
 }
 
 type PermissionService interface {
-	SavePermission(permission *domain.Permission) (*domain.Permission, error)
+	SavePermission(name, description string) (*domain.Permission, error)
 	RetrievePermissionById(permissionId uuid.UUID) (*domain.Permission, error)
 }
 
-func (ps *permissionService) SavePermission(permission *domain.Permission) (*domain.Permission, error) {
-	err := validatePermission(permission)
+func (ps *permissionService) SavePermission(name, description string) (*domain.Permission, error) {
+	err := validatePermissionValues(name, description)
 	if err != nil {
 		return nil, err
 	}
+	permission, err := domain.NewPermission(name, description)
+	if err != nil {
+		return nil, err
+	}
+	//TODO: Add validation for the unique constraint.
 	permissionCreated, err := ps.repo.StorePermission(permission)
 	if err != nil {
 		return nil, err
@@ -33,17 +38,17 @@ func (ps *permissionService) SavePermission(permission *domain.Permission) (*dom
 	return permissionCreated, err
 }
 
-func validatePermission(permission *domain.Permission) error {
-	if strings.TrimSpace(permission.Name) == "" {
+func validatePermissionValues(name, description string) error {
+	if strings.TrimSpace(name) == "" {
 		return errors.New("name cannot be empty")
 	}
-	if len(permission.Name) > 255 {
+	if len(name) > 255 {
 		return errors.New("name must be less than or equal to 255 characters")
 	}
-	if strings.TrimSpace(permission.Description) == "" {
+	if strings.TrimSpace(description) == "" {
 		return errors.New("description cannot be empty")
 	}
-	if len(permission.Description) > 255 {
+	if len(description) > 255 {
 		return errors.New("description must be less than or equal to 255 characters")
 	}
 	return nil

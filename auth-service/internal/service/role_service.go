@@ -17,16 +17,17 @@ type roleService struct {
 }
 
 type RoleService interface {
-	SaveRole(role *domain.Role) (*domain.Role, error)
+	SaveRole(name, description string) (*domain.Role, error)
 	RetrieveRoleById(roleID uuid.UUID) (*domain.Role, error)
 	AddPermissionToRole(roleID, permissionID uuid.UUID) error
 }
 
-func (rs *roleService) SaveRole(role *domain.Role) (*domain.Role, error) {
-	err := validateRole(role)
+func (rs *roleService) SaveRole(name, description string) (*domain.Role, error) {
+	err := validateRole(name, description)
 	if err != nil {
 		return nil, err
 	}
+	role, _ := domain.NewRole(name, description)
 	role, err = rs.roleRepo.StoreRole(role)
 	if err != nil {
 		return nil, err
@@ -34,17 +35,17 @@ func (rs *roleService) SaveRole(role *domain.Role) (*domain.Role, error) {
 	return role, nil
 }
 
-func validateRole(role *domain.Role) error {
-	if strings.TrimSpace(role.Name) == "" {
+func validateRole(name, description string) error {
+	if strings.TrimSpace(name) == "" {
 		return errors.New("name cannot be empty")
 	}
-	if len(role.Name) > 255 {
+	if len(name) > 255 {
 		return errors.New("name must be less than or equal to 255 characters")
 	}
-	if strings.TrimSpace(role.Description) == "" {
+	if strings.TrimSpace(description) == "" {
 		return errors.New("description cannot be empty")
 	}
-	if len(role.Description) > 255 {
+	if len(description) > 255 {
 		return errors.New("description must be less than or equal to 255 characters")
 	}
 	return nil

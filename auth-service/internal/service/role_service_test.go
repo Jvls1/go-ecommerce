@@ -15,7 +15,7 @@ func TestSaveRole(t *testing.T) {
 	roleValid := createValidRole()
 	roleRepo.EXPECT().StoreRole(roleValid).Return(roleValid, nil)
 	roleServiceTest := NewRoleService(roleRepo)
-	role, err := roleServiceTest.SaveRole(roleValid)
+	role, err := roleServiceTest.SaveRole(roleValid.Name, roleValid.Description)
 	assert.NotNil(t, role)
 	assert.NoError(t, err)
 }
@@ -23,7 +23,7 @@ func TestSaveRole(t *testing.T) {
 func TestSaveInvalidRole(t *testing.T) {
 	roleRepo := createRoleRepoMock(t)
 	roleServiceTest := NewRoleService(roleRepo)
-	role, err := roleServiceTest.SaveRole(createInvalidRole())
+	role, err := roleServiceTest.SaveRole("", "")
 	assert.Nil(t, role)
 	assert.Error(t, err)
 }
@@ -71,15 +71,4 @@ func createRoleRepoMock(t *testing.T) *mocks.MockRoleRepository {
 func createValidRole() *domain.Role {
 	role, _ := domain.NewRole("Admin", "Admin")
 	return role
-}
-
-func createInvalidRole() *domain.Role {
-	return &domain.Role{
-		ID:          uuid.UUID{},
-		Name:        "",
-		Description: "",
-		CreatedAt:   time.Time{},
-		UpdatedAt:   time.Time{},
-		DeletedAt:   nil,
-	}
 }

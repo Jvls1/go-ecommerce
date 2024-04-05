@@ -17,16 +17,17 @@ type userService struct {
 }
 
 type UserService interface {
-	SaveUser(user *domain.User) (*domain.User, error)
+	SaveUser(name, password, email string) (*domain.User, error)
 	RetrieveUserById(userID uuid.UUID) (*domain.User, error)
 	AddRoleToUser(userID, roleID uuid.UUID) error
 }
 
-func (us *userService) SaveUser(user *domain.User) (*domain.User, error) {
-	err := validateUser(user)
+func (us *userService) SaveUser(name, password, email string) (*domain.User, error) {
+	err := validateUser(name, password, email)
 	if err != nil {
 		return nil, err
 	}
+	user, _ := domain.NewUser(name, password, email)
 	storedUser, err := us.repo.StoreUser(user)
 	if err != nil {
 		return nil, err
@@ -34,17 +35,17 @@ func (us *userService) SaveUser(user *domain.User) (*domain.User, error) {
 	return storedUser, nil
 }
 
-func validateUser(user *domain.User) error {
-	if strings.TrimSpace(user.Name) == "" {
+func validateUser(name, password, email string) error {
+	if strings.TrimSpace(name) == "" {
 		return errors.New("name cannot be empty")
 	}
-	if len(user.Name) > 255 {
+	if len(name) > 255 {
 		return errors.New("name must be less than or equal to 255 characters")
 	}
-	if strings.TrimSpace(user.Email) == "" {
+	if strings.TrimSpace(email) == "" {
 		return errors.New("email cannot be empty")
 	}
-	if len(user.Email) > 255 {
+	if len(email) > 255 {
 		return errors.New("description must be less than or equal to 255 characters")
 	}
 	return nil

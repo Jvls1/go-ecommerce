@@ -16,7 +16,7 @@ func TestSavePermission(t *testing.T) {
 	permissionRepo.EXPECT().StorePermission(permission).Return(permission, nil)
 	permissionServiceTest := NewPermissionService(permissionRepo)
 
-	permissionSaved, err := permissionServiceTest.SavePermission(permission)
+	permissionSaved, err := permissionServiceTest.SavePermission(permission.Name, permission.Description)
 
 	assert.NoError(t, err)
 	assert.NotNil(t, permissionSaved)
@@ -27,7 +27,7 @@ func TestSavePermissionInvalid(t *testing.T) {
 	invalidPermission := createInvalidPermission()
 	permissionServiceTest := NewPermissionService(permissionRepo)
 
-	permissionSaved, err := permissionServiceTest.SavePermission(invalidPermission)
+	permissionSaved, err := permissionServiceTest.SavePermission(invalidPermission.Name, invalidPermission.Description)
 
 	assert.Nil(t, permissionSaved)
 	assert.Error(t, err)

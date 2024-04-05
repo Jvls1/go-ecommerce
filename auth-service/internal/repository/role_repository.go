@@ -47,10 +47,40 @@ func (roleRepository *roleRepository) GetRoleById(id uuid.UUID) (*domain.Role, e
 	}
 	role := &domain.Role{}
 	err = stmt.QueryRow(id).Scan(&role.ID, &role.Name, &role.Description, &role.CreatedAt, &role.UpdatedAt)
+	permissions, err := roleRepository.getPermissionsByRoleId(role.ID)
 	if err != nil {
 		return nil, err
 	}
+	role.Permissions = permissions
 	return role, nil
+}
+
+func (roleRepository *roleRepository) getPermissionsByRoleId(roleId uuid.UUID) ([]domain.Permission, error) {
+	permissionsStmt, err := roleRepository.db.Prepare(`
+		SELECT p.id, p.name, p.description, p.created_at, p.updated_at
+		  FROM role_permissions rp
+		 INNER JOIN permissions p ON rp.permission_id = p.id
+		 WHERE rp.role_id = $1;
+	`)
+	if err != nil {
+		return nil, err
+	}
+	rows, err := permissionsStmt.Query(roleId)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var permissions []domain.Permission
+	for rows.Next() {
+		var permission domain.Permission
+		err = rows.Scan(&permission.ID, &permission.Name, &permission.Description, &permission.CreatedAt, &permission.UpdatedAt)
+		if err != nil {
+			return nil, err
+		}
+		permissions = append(permissions, permission)
+	}
+	return permissions, nil
 }
 
 func (roleRepository *roleRepository) AddPermissionToRole(roleID, permissionID uuid.UUID) error {

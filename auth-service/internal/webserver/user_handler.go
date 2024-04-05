@@ -31,7 +31,7 @@ func (uh *userHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 		helpers.HandlerError(w, err, "Can't convert JSON", http.StatusBadRequest)
 		return
 	}
-	user, err := uh.userService.SaveUser(userToSave)
+	user, err := uh.userService.SaveUser(userToSave.Name, userToSave.Password, userToSave.Email)
 	if err != nil {
 		helpers.HandlerError(w, err, "Can't save the user", http.StatusInternalServerError)
 		return

@@ -48,7 +48,7 @@ func (userRepository *userRepository) GetUserById(id uuid.UUID) (*domain.User, e
 	if err != nil {
 		return nil, err
 	}
-	var user domain.User
+	user := &domain.User{}
 	err = stmt.QueryRow(id).Scan(&user.ID, &user.Name, &user.Email, &user.CreatedAt, &user.UpdatedAt)
 	if err != nil {
 		return nil, err
@@ -58,11 +58,16 @@ func (userRepository *userRepository) GetUserById(id uuid.UUID) (*domain.User, e
 		return nil, err
 	}
 	user.Roles = roles
-	return &user, nil
+	return user, nil
 }
 
 func (userRepository *userRepository) getRolesByUserId(userId uuid.UUID) ([]domain.Role, error) {
-	stmt, err := userRepository.db.Prepare(`SELECT role_id FROM user_roles ur WHERE ur.user_id = $1`)
+	stmt, err := userRepository.db.Prepare(`
+		SELECT r.id, r.name, r.description, r.created_at, r.updated_at 
+		  FROM user_roles ur
+		 INNER JOIN roles r on ur.role_id = r.id
+		 WHERE ur.user_id = $1
+	`)
 	defer stmt.Close()
 	if err != nil {
 		return nil, err
@@ -76,7 +81,7 @@ func (userRepository *userRepository) getRolesByUserId(userId uuid.UUID) ([]doma
 	var roles []domain.Role
 	for rows.Next() {
 		var role domain.Role
-		err = rows.Scan(&role.ID, &role.Name, &role.Description, &role.CreatedAt, &role.UpdatedAt, &role.DeletedAt)
+		err = rows.Scan(&role.ID, &role.Name, &role.Description, &role.CreatedAt, &role.UpdatedAt)
 		if err != nil {
 			return nil, err
 		}
