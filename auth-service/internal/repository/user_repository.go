@@ -17,7 +17,9 @@ type userRepository struct {
 type UserRepository interface {
 	StoreUser(user *domain.User) (*domain.User, error)
 	GetUserById(id uuid.UUID) (*domain.User, error)
+	GetUserByEmail(email string) (*domain.User, error)
 	AddRoleToUser(userID, roleID uuid.UUID) error
+	GetRolesByUserId(userId uuid.UUID) ([]domain.Role, error)
 }
 
 func (userRepository *userRepository) StoreUser(user *domain.User) (*domain.User, error) {
@@ -53,7 +55,7 @@ func (userRepository *userRepository) GetUserById(id uuid.UUID) (*domain.User, e
 	if err != nil {
 		return nil, err
 	}
-	roles, err := userRepository.getRolesByUserId(id)
+	roles, err := userRepository.GetRolesByUserId(id)
 	if err != nil {
 		return nil, err
 	}
@@ -61,7 +63,7 @@ func (userRepository *userRepository) GetUserById(id uuid.UUID) (*domain.User, e
 	return user, nil
 }
 
-func (userRepository *userRepository) getRolesByUserId(userId uuid.UUID) ([]domain.Role, error) {
+func (userRepository *userRepository) GetRolesByUserId(userId uuid.UUID) ([]domain.Role, error) {
 	stmt, err := userRepository.db.Prepare(`
 		SELECT r.id, r.name, r.description, r.created_at, r.updated_at 
 		  FROM user_roles ur
@@ -88,6 +90,25 @@ func (userRepository *userRepository) getRolesByUserId(userId uuid.UUID) ([]doma
 		roles = append(roles, role)
 	}
 	return roles, nil
+}
+
+func (userRepository *userRepository) GetUserByEmail(email string) (*domain.User, error) {
+	stmt, err := userRepository.db.Prepare(`
+		SELECT id, name, password
+		  FROM users u
+		 WHERE u.email = $1
+		   AND deleted_at IS NULL
+	`)
+	defer stmt.Close()
+	if err != nil {
+		return nil, err
+	}
+	user := &domain.User{}
+	err = stmt.QueryRow(email).Scan(&user.ID, &user.Name, &user.Password)
+	if err != nil {
+		return nil, err
+	}
+	return user, nil
 }
 
 func (userRepository *userRepository) AddRoleToUser(userID, roleID uuid.UUID) error {
