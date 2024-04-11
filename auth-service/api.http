@@ -3,8 +3,8 @@ Content-Type: application/json
 Authorization: Bearer {{authToken}}
 
 {
-  "name": "create-product-4",
-  "description": "Grant access to create a product"
+  "name": "read-permission",
+  "description": "Grant access to create a permission"
 }
 
 ###
@@ -32,7 +32,7 @@ Authorization: Bearer {{authToken}}
 
 {
   "roleId": "5658b58d-b749-4a74-bb71-483324eb0705",
-  "permissionId": "6d6b8531-d5bc-4c7b-92ab-ac52837e0280"
+  "permissionId": "c523de53-8b8e-47fa-a751-15f0e678f8d9"
 }
 
 ###

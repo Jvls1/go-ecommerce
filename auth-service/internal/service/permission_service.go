@@ -19,6 +19,7 @@ type permissionService struct {
 type PermissionService interface {
 	SavePermission(name, description string) (*domain.Permission, error)
 	RetrievePermissionById(permissionId uuid.UUID) (*domain.Permission, error)
+	RetrievePermissionsByRoleName(roleName string) ([]string, error)
 }
 
 func (ps *permissionService) SavePermission(name, description string) (*domain.Permission, error) {
@@ -60,4 +61,8 @@ func (ps *permissionService) RetrievePermissionById(permissionId uuid.UUID) (*do
 		return nil, err
 	}
 	return permission, nil
+}
+
+func (ps *permissionService) RetrievePermissionsByRoleName(roleName string) ([]string, error) {
+	return ps.repo.GetPermissionsByRoleName(roleName)
 }

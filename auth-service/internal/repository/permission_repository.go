@@ -17,6 +17,7 @@ type permissionRepository struct {
 type PermissionRepository interface {
 	StorePermission(permission *domain.Permission) (*domain.Permission, error)
 	GetPermissionById(id uuid.UUID) (*domain.Permission, error)
+	GetPermissionsByRoleName(name string) ([]string, error)
 }
 
 func (permissionRepository *permissionRepository) StorePermission(permission *domain.Permission) (*domain.Permission, error) {
@@ -46,10 +47,49 @@ func (permissionRepository *permissionRepository) GetPermissionById(id uuid.UUID
 	if err != nil {
 		return nil, err
 	}
+	defer stmt.Close()
+
 	permission := &domain.Permission{}
 	err = stmt.QueryRow(id).Scan(&permission.ID, &permission.Name, &permission.Description, &permission.CreatedAt, &permission.UpdatedAt)
 	if err != nil {
 		return nil, err
 	}
 	return permission, nil
+}
+
+func (permissionRepository *permissionRepository) GetPermissionsByRoleName(name string) ([]string, error) {
+	stmt, err := permissionRepository.db.Prepare(`
+		SELECT p.name
+  		  FROM permissions p
+  		  JOIN role_permissions rp ON p.id = rp.permission_id
+  		  JOIN roles r             ON rp.role_id = r.id
+ 		 WHERE r.name = $1
+		   AND p.deleted_at IS NULL
+	`)
+	if err != nil {
+		return nil, err
+	}
+	defer stmt.Close()
+
+	rows, err := stmt.Query(name)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var permissions []string
+	for rows.Next() {
+		var permissionName string
+		err = rows.Scan(&permissionName)
+		if err != nil {
+			return nil, err
+		}
+		permissions = append(permissions, permissionName)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return permissions, nil
 }

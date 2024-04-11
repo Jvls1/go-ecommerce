@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"github.com/Jvls1/go-ecommerce/internal/middleware"
 	"github.com/Jvls1/go-ecommerce/internal/repository"
 	"github.com/Jvls1/go-ecommerce/internal/service"
 	"github.com/Jvls1/go-ecommerce/internal/webserver"
@@ -14,13 +15,13 @@ import (
 	"os"
 )
 
-var tokenAuth *jwtauth.JWTAuth
-
 var (
-	permissionHandler webserver.PermissionHandler
-	userHandler       webserver.UserHandler
-	roleHandler       webserver.RoleHandler
-	authHandler       webserver.AuthHandler
+	tokenAuth            *jwtauth.JWTAuth
+	permissionHandler    webserver.PermissionHandler
+	userHandler          webserver.UserHandler
+	roleHandler          webserver.RoleHandler
+	authHandler          webserver.AuthHandler
+	permissionMiddleware middleware.PermissionMiddleware
 )
 
 func init() {
@@ -33,6 +34,7 @@ func main() {
 	permissionRepository, userRepository, roleRepository := createRepoInstances(db)
 	permissionService, userService, roleService := createServicesInstance(permissionRepository, userRepository, roleRepository)
 	createHandlersInstance(permissionService, userService, roleService)
+	createMiddlewaresInstance(permissionService)
 	err := http.ListenAndServe(os.Getenv("PORT"), JSONMiddleware(router()))
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
@@ -67,6 +69,10 @@ func createHandlersInstance(permissionService service.PermissionService, userSer
 	authHandler = webserver.NewAuthHandler(userService, tokenAuth)
 }
 
+func createMiddlewaresInstance(permissionService service.PermissionService) {
+	permissionMiddleware = middleware.NewPermissionMiddleware(permissionService)
+}
+
 func router() http.Handler {
 	r := chi.NewRouter()
 	r.Group(func(r chi.Router) {
@@ -76,18 +82,18 @@ func router() http.Handler {
 		r.Use(jwtauth.Verifier(tokenAuth))
 		r.Use(jwtauth.Authenticator(tokenAuth))
 		r.Route("/permissions", func(r chi.Router) {
-			r.Get("/{permissionId}", permissionHandler.GetPermissionById)
-			r.Post("/", permissionHandler.CreatePermission)
+			r.With(permissionMiddleware.RequirePermission("read-permission")).Get("/{permissionId}", permissionHandler.GetPermissionById)
+			r.With(permissionMiddleware.RequirePermission("create-permission")).Post("/", permissionHandler.CreatePermission)
 		})
 		r.Route("/users", func(r chi.Router) {
-			r.Get("/{userId}", userHandler.GetUserById)
-			r.Post("/", userHandler.CreateUser)
-			r.Post("/roles", userHandler.AddRoleToUser)
+			r.With(permissionMiddleware.RequirePermission("read-user")).Get("/{userId}", userHandler.GetUserById)
+			r.With(permissionMiddleware.RequirePermission("create-user")).Post("/", userHandler.CreateUser)
+			r.With(permissionMiddleware.RequirePermission("add-role-user")).Post("/roles", userHandler.AddRoleToUser)
 		})
 		r.Route("/roles", func(r chi.Router) {
-			r.Get("/{roleId}", roleHandler.GetRoleById)
-			r.Post("/", roleHandler.CreateRole)
-			r.Post("/permissions", roleHandler.AddPermissionToRole)
+			r.With(permissionMiddleware.RequirePermission("read-role")).Get("/{roleId}", roleHandler.GetRoleById)
+			r.With(permissionMiddleware.RequirePermission("create-role")).Post("/", roleHandler.CreateRole)
+			r.With(permissionMiddleware.RequirePermission("add-permission-role")).Post("/permissions", roleHandler.AddPermissionToRole)
 		})
 	})
 	return r
